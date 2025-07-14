@@ -8,11 +8,11 @@ Cервіс використовує API [https://vpnapi.io/](https://vpnapi.io/
 
 ### 1. 📋 Перевірка заборонених IP-адрес
 Сервіс містить локальну базу заборонених IP, що зберігаються у MongoDB.  
-➡️ [Seeder з IP](https://github.com/nikiforova-yuliia/cloak-service/blob/master/migrations/20250713225433-seed-forbidden-ip-addresses.js)
+➡️ [Seed з IP](https://github.com/nikiforova-yuliia/cloak-service/blob/master/migrations/20250713225433-seed-forbidden-ip-addresses.js)
 
 ### 2. 🌍 Перевірка несанкціонованих країн
 IP, що належать певним країнам (напр., Китай, Іран), автоматично вважаються підозрілими.  
-➡️ [Seeder з країнами](https://github.com/nikiforova-yuliia/cloak-service/blob/master/migrations/20250713231001-seed-unauthorized-countries.js)
+➡️ [Seed з країнами](https://github.com/nikiforova-yuliia/cloak-service/blob/master/migrations/20250713231001-seed-unauthorized-countries.js)
 
 ### 3. 🔒 Перевірка ознак анонімності
 За допомогою властивості `security` з VPN API перевіряються такі параметри:
