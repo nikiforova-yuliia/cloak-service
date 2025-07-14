@@ -1,73 +1,88 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# 🛡️ Cloak Service
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+**Cloak Service** — це сервіс для виявлення підозрілих IP-адрес та фільтрації ботів. Його основна задача — отримати IP-адресу через REST API, перевірити її на відповідність встановленим критеріям та повернути результат: **бот** чи **не бот**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📌 Основна ідея
 
-## Description
+Cервіс використовує API [https://vpnapi.io/](https://vpnapi.io/api-documentation) для перевірки IP-адреси, отримуючи розширену інформацію про неї. Валідація базується на трьох основних перевірках:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### 1. 📋 Перевірка заборонених IP-адрес
+Сервіс містить локальну базу заборонених IP, що зберігаються у MongoDB.  
+➡️ [Seeder з IP](https://github.com/nikiforova-yuliia/cloak-service/blob/master/migrations/20250713225433-seed-forbidden-ip-addresses.js)
 
-## Installation
+### 2. 🌍 Перевірка несанкціонованих країн
+IP, що належать певним країнам (напр., Китай, Іран), автоматично вважаються підозрілими.  
+➡️ [Seeder з країнами](https://github.com/nikiforova-yuliia/cloak-service/blob/master/migrations/20250713231001-seed-unauthorized-countries.js)
 
-```bash
-$ npm install
+### 3. 🔒 Перевірка ознак анонімності
+За допомогою властивості `security` з VPN API перевіряються такі параметри:
+- `vpn`
+- `proxy`
+- `tor`
+- `relay`
+
+## ✅ Результат
+Якщо IP не проходить **хоч одну** з перевірок — відповідь виглядає так:
+
+```json
+{
+  "isBot": true
+}
 ```
 
-## Running the app
+До того ж, IP буде додано до бази заборонених, якщо його там ще не було. Таким чином база поступово збагачується.
+
+> ⚠️ Увага: доступний ліміт API — до **1000 запитів на добу**.
+
+---
+
+## ⚙️ Запуск проєкту
+
+> Перед запуском переконайтеся, що **порт `3001`** вільний на вашій машині.
+
+### 1. Клонування репозиторію
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+git clone https://github.com/nikiforova-yuliia/cloak-service.git
+cd cloak-service
 ```
 
-## Test
+### 2. Запуск через Docker
+
+Встановіть [Docker](https://www.docker.com/) та переконайтеся, що він запущений.
+
+У терміналі виконайте:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+docker-compose build
 ```
 
-## Support
+```bash
+docker-compose up
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Swagger документація буде доступна за посиланням:  
+🔗 [http://localhost:3001/swagger](http://localhost:3001/swagger)
 
-## Stay in touch
+---
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## 🧪 Тестові IP-адреси
 
-## License
+### 🌐 IP, які відповідають забороненим країнам:
 
-Nest is [MIT licensed](LICENSE).
+| IP              | Країна |
+|------------------|--------|
+| `39.156.69.79`   | Китай  |
+| `103.111.69.255` | Іран   |
+| `1.23.255.255`   | Індія  |
+| `109.120.159.0`  | Росія  |
+
+➡️ Відповідь для цих IP: `isBot: true`
+
+### ⚠️ Інші приклади:
+
+- `2001:4860:4860::8888` — IP з ознаками VPN → `isBot: true`
+- `2001:0db8:85a3:0000:0000:8a2e:0370:7334` — приватний IP → помилка `422 Unprocessable Entity`
+
+Дізнатись свою IP-адресу для тестування можна тут:  
+🔗 [https://whatismyipaddress.com/](https://whatismyipaddress.com/)

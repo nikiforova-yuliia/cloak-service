@@ -9,15 +9,7 @@ export class ForbiddenIpAddressRepository {
     ) {}
 
     async addForbiddenIpAddress(ip: string): Promise<void> {
-        console.log(4343434);
-        try {
-            console.log(111);
-            console.log(this.model.collection.name);
-            await this.model.create({ ip });
-            console.log(this.model.collection.name);
-        } catch (err) {
-            console.log(err);
-        }
+        await this.model.create({ ip });
     }
 
     async findForbiddenIpAddress(ip: string): Promise<ForbiddenIpAddress> {

@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - '3001:3000'
+    environment:
+      - PORT=3000
+      - DB_URI=mongodb://mongo:27017/
+      - SWAGGER_TITLE=Cloak Service API
+      - SWAGGER_BACKEND_URL=http://localhost:3001
+      - VPNAPI_API_KEY=7f3b81ddd38946d58d4f3950e94de4ad
+      - VPNAPI_BASE_URL=https://vpnapi.io/api/
+    depends_on:
+      - mongo
+    command: npm run start:prod
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7.0
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+
+volumes:
+  mongo-data:
