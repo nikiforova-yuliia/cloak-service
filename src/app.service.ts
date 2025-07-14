@@ -8,22 +8,29 @@ export class AppService {
     constructor(
         private readonly forbiddenIpAddressRepository: ForbiddenIpAddressRepository,
         private readonly unauthorizedCountryRepository: UnauthorizedCountryRepository,
-        private readonly configService: ConfigService,
+        private readonly configService: ConfigService
     ) {}
 
     async checkForbiddenIpAddress(ipAddress: string): Promise<boolean> {
-        const forbiddenAddress = await this.forbiddenIpAddressRepository.findForbiddenIpAddress(ipAddress);
+        const forbiddenAddress = await this.forbiddenIpAddressRepository.findForbiddenIpAddress(
+            ipAddress
+        );
 
         return !!forbiddenAddress;
     }
 
-    async checkUnautorizedCountry(country: string): Promise<boolean> {
-        const unauthorizedCountry = await this.unauthorizedCountryRepository.findUnauthorizedCountry(country);
+    async checkUnauthorizedCountry(country: string): Promise<boolean> {
+        const unauthorizedCountry =
+            await this.unauthorizedCountryRepository.findUnauthorizedCountry(country);
 
         return !!unauthorizedCountry;
     }
 
-    async getIpAddressInfo(ipAddress: string) {
+    async addForbiddenIpAddress(ipAddress: string): Promise<void> {
+        await this.forbiddenIpAddressRepository.addForbiddenIpAddress(ipAddress);
+    }
+
+    async getIpAddressInfo(ipAddress: string): Promise<any> {
         const url = this.configService.get('VPNAPI_BASE_URL');
         const apiKey = this.configService.get('VPNAPI_API_KEY');
 
@@ -32,8 +39,8 @@ export class AppService {
                 method: 'get',
                 url: url + ipAddress + '?key=' + apiKey,
                 headers: {
-                    'Content-Type': 'application/json',
-                },
+                    'Content-Type': 'application/json'
+                }
             });
 
             return response.data;

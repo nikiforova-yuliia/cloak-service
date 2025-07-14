@@ -5,8 +5,8 @@ import { MongooseConfigService } from './mongoose-config-service';
 @Module({
     imports: [
         MongooseModule.forRootAsync({
-            useClass: MongooseConfigService,
-        }),
-    ],
+            useClass: MongooseConfigService
+        })
+    ]
 })
 export class DatabaseModule {}

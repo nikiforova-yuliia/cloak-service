@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ForbiddenIpAddressRepository, UnauthorizedCountryRepository } from './repositories';
-import { MongooseModule } from '@nestjs/mongoose';
 import {
     ForbiddenIpAddress,
     ForbiddenIpAddressSchema,
     UnauthorizedCountry,
-    UnauthorizedCountrySchema,
+    UnauthorizedCountrySchema
 } from './schemas';
 import { DatabaseModule } from './common/database/database.module';
 
@@ -20,11 +20,11 @@ import { DatabaseModule } from './common/database/database.module';
             { name: ForbiddenIpAddress.name, schema: ForbiddenIpAddressSchema },
             {
                 name: UnauthorizedCountry.name,
-                schema: UnauthorizedCountrySchema,
-            },
-        ]),
+                schema: UnauthorizedCountrySchema
+            }
+        ])
     ],
     controllers: [AppController],
-    providers: [AppService, ForbiddenIpAddressRepository, UnauthorizedCountryRepository],
+    providers: [AppService, ForbiddenIpAddressRepository, UnauthorizedCountryRepository]
 })
 export class AppModule {}

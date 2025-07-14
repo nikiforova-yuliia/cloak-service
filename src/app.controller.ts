@@ -1,4 +1,11 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UnprocessableEntityException } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    HttpCode,
+    HttpStatus,
+    Post,
+    UnprocessableEntityException
+} from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AppService } from './app.service';
 import { IpAddressDto, IsIpAddressBotDto } from './dto';
@@ -23,8 +30,6 @@ export class AppController {
 
         const ipAddressInfo = await this.appService.getIpAddressInfo(body.ip);
 
-        console.log(ipAddressInfo);
-
         if (!ipAddressInfo || ipAddressInfo.message) {
             throw new UnprocessableEntityException();
         }
@@ -32,12 +37,16 @@ export class AppController {
         const { vpn, proxy, tor, relay } = ipAddressInfo.security;
 
         if (vpn || proxy || tor || relay) {
+            await this.appService.addForbiddenIpAddress(body.ip);
             return new IsIpAddressBotDto(true);
         }
 
-        const isUnauthorizedCountry = await this.appService.checkUnautorizedCountry(ipAddressInfo.location.country);
+        const isUnauthorizedCountry = await this.appService.checkUnauthorizedCountry(
+            ipAddressInfo.location.country
+        );
 
         if (isUnauthorizedCountry) {
+            await this.appService.addForbiddenIpAddress(body.ip);
             return new IsIpAddressBotDto(true);
         }
 
